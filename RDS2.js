@@ -1,4 +1,5 @@
 
+//RDS2 Runtime ver 0.19
 
   /**
    * @hidden
@@ -376,6 +377,34 @@ SpawnPrefab(name){
                 return
             }
         },
+                         /**
+
+     * @param {string} ObjectName - name of RDS2 Audio object.
+     * @param {File} Data - location of Audio file.
+     * 
+     * Creates an RDS2 Audio Object
+
+     */
+         LoadSound(ObjectName, Data){
+            if(!ObjectName){
+                console.error("no object name was added to LoadSound()")
+                return
+            }
+            if(Data){
+                let sprite = new Audio()
+                sprite.src = Data
+                if(!sprite.src){
+                       console.error("No audio data may be corrupted or invalid")
+                       return
+                }
+
+                Rendream.Assets.Sounds[ObjectName] = sprite
+
+            }else{
+                console.error("No image data was Provided to load")
+                return
+            }
+        },
 
             /**
  * Sprite management system.
@@ -384,6 +413,15 @@ SpawnPrefab(name){
  * @namespace
  */
             Sprites:{
+
+    },
+    /**
+     * Audio management system.
+ * 
+ * `Rendream.Assets.Audio.[RDS2 Sounds Object]`
+ * @namespace
+ */
+                Sounds:{
 
     },
 
@@ -487,6 +525,31 @@ Storage:{
 
               SetYVelocityDampining(value){
             VertDamp = value
+        }
+    },
+    /**
+ * Main Rendream engine Audio management system.
+ * @namespace
+ */
+    Audio:{
+                
+                                    /**
+     * Play an RDS2 Audio Object
+     * @param {RDS2 Audio Object} RDSAUDIO - selected rds audio file (use Rendream.Assets.Sounds.[objectName]).
+     * @param {params} params - options for playing audio file.
+
+
+     */
+        Play(RDSAUDIO,params){
+            if(params){
+            if(params.loop){
+                RDSAUDIO.loop = params.loop
+            }
+               if(params.volume){
+                RDSAUDIO.volume = params.volume
+            }
+        }
+            RDSAUDIO.play()
         }
     }
 
@@ -604,7 +667,7 @@ if(GameObject.Collidable && !GameObject.hitbox){
   
  
 
-    if(GameObject.hitbox && GameObject.ApplyPhysics){
+    if(GameObject.hitbox){
         Object.values(RDM).forEach(OtherObject => {
             if(OtherObject === GameObject || !OtherObject.hitbox || !GameObject.hitbox){
                 return
@@ -642,7 +705,11 @@ if(GameObject.Collidable && !GameObject.hitbox){
         }
     }
 
-    GameObject.y += GameObject.vy
+    GameObject.vy *= VertDamp
+   GameObject.y += GameObject.vy
+    if(GameObject.vy <= 0.66 && GameObject.vy >= -0.66){
+        GameObject.vy = 0
+    }
  
 
     if(GameObject.hitbox){
